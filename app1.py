@@ -331,7 +331,8 @@ def main():
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)
     fig.update_layout(height=600, margin=dict(l=0,r=0,b=0,t=0))
-
+    fig.update_layout(legend=dict(x=0.85,y=0.95))
+        
     # **do not disable legend globally** – vp entries will appear
     # fig.update_layout(showlegend=False)
     fig.update_xaxes(range=[-8,8])
@@ -347,6 +348,7 @@ def main():
 
     fig.update_xaxes(range=[xmin-pad, xmax+pad], visible=False)
     fig.update_yaxes(range=[ymin-pad, ymax+pad], visible=False)
+    fig.update_yaxes(scaleanchor="x", scaleratio=1)
     st.plotly_chart(fig, width="stretch")
    
 

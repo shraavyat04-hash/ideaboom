@@ -103,7 +103,7 @@ def cross_ratio(A, B, C, D):
 # scene objects (copied verbatim from geonew1.py)
 cube_pts = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],
                      [-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]])
-cube_pts[:,2] += 8
+cube_pts[:,2] += 6
 cube_edges = [(0,1),(1,2),(2,3),(3,0),
               (4,5),(5,6),(6,7),(7,4),
               (0,4),(1,5),(2,6),(3,7)]
@@ -214,7 +214,7 @@ def main():
                 fig.add_trace(go.Scatter(
                     x=[vp_x], y=[vp_y],
                     mode="markers",
-                    marker=dict(size=8, color=color),
+                    marker=dict(size=12, color=color, line=dict(width=1,color='black')),
                     name=f"{color} vp"            # legend entry
                 ))
             else:                                 # point at infinity
@@ -234,26 +234,47 @@ def main():
                         showarrow=False, font=dict(color=color)
                     )
 
-        # convergence/vanishing lines (draw from edge midpoints to vp)
-        if choice in ["Cube","Pyramid","Plane"]:
-            for edge in obj.edges[::3]:
+        # ---- convergence / vanishing lines --------------------------------
+    if choice in ["Cube","Pyramid","Plane"]:
+
+        axis_edges = {0: [], 1: [], 2: []}
+
+        # classify edges by dominant axis direction
+        for edge in obj.edges:
+            d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
+            d3 = d3 / np.linalg.norm(d3)   # normalize direction
+            axis = np.argmax(np.abs(d3))
+            axis_edges[axis].append(edge)
+
+        # draw exactly two rays per direction
+        for axis in range(3):
+
+            edges = axis_edges[axis][:2]
+            color = ['red','green','blue'][axis]
+
+            for edge in edges:
+
                 p1 = coords2d[edge[0]]
                 p2 = coords2d[edge[1]]
+                mid = (p1+p2)/2
+
                 d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-                dh = np.append(d3, 0)
+                dh = np.append(d3,0)
+
                 v = P @ dh
                 Xv,Yv,Wv = v
+
                 if abs(Wv) > 1e-6:
-                    vp_x, vp_y = Xv/Wv, Yv/Wv
-                    mid = (p1+p2)/2
-                    d3 = d3 / np.linalg.norm(d3)
-                    axis = np.argmax(np.abs(d3))
-                    color = ['red','green','blue'][axis]
+
+                    vp_x = Xv/Wv
+                    vp_y = Yv/Wv
+
                     fig.add_trace(go.Scatter(
-                        x=[mid[0], vp_x], y=[mid[1], vp_y],
+                        x=[mid[0], vp_x],
+                        y=[mid[1], vp_y],
                         mode='lines',
-                        line=dict(color=color, dash='dot'),
-                        opacity=0.6,
+                        line=dict(color=color, dash='dot', width=2),
+                        opacity=0.7,
                         showlegend=False
                     ))
 
@@ -313,10 +334,21 @@ def main():
 
     # **do not disable legend globally** – vp entries will appear
     # fig.update_layout(showlegend=False)
+    fig.update_xaxes(range=[-8,8])
+    fig.update_yaxes(range=[-8,8])
+    # ---- auto frame scene ---------------------------------------------
 
+    pts = coords2d
+
+    xmin, xmax = pts[:,0].min(), pts[:,0].max()
+    ymin, ymax = pts[:,1].min(), pts[:,1].max()
+
+    pad = 2
+
+    fig.update_xaxes(range=[xmin-pad, xmax+pad], visible=False)
+    fig.update_yaxes(range=[ymin-pad, ymax+pad], visible=False)
     st.plotly_chart(fig, width="stretch")
-    st.write("Vanishing points:")
-    st.write(vx, vy, vz)
+   
 
 if __name__ == "__main__":
     main()

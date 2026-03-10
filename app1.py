@@ -235,48 +235,48 @@ def main():
                     )
 
         # ---- convergence / vanishing lines --------------------------------
-    if choice in ["Cube","Pyramid","Plane"]:
+        if choice in ["Cube","Pyramid","Plane"]:
 
-        axis_edges = {0: [], 1: [], 2: []}
+            axis_edges = {0: [], 1: [], 2: []}
 
-        # classify edges by dominant axis direction
-        for edge in obj.edges:
-            d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-            d3 = d3 / np.linalg.norm(d3)   # normalize direction
-            axis = np.argmax(np.abs(d3))
-            axis_edges[axis].append(edge)
-
-        # draw exactly two rays per direction
-        for axis in range(3):
-
-            edges = axis_edges[axis][:2]
-            color = ['red','green','blue'][axis]
-
-            for edge in edges:
-
-                p1 = coords2d[edge[0]]
-                p2 = coords2d[edge[1]]
-                mid = (p1+p2)/2
-
+            # classify edges by dominant axis direction
+            for edge in obj.edges:
                 d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-                dh = np.append(d3,0)
+                d3 = d3 / np.linalg.norm(d3)   # normalize direction
+                axis = np.argmax(np.abs(d3))
+                axis_edges[axis].append(edge)
 
-                v = P @ dh
-                Xv,Yv,Wv = v
+            # draw exactly two rays per direction
+            for axis in range(3):
 
-                if abs(Wv) > 1e-6:
+                edges = axis_edges[axis][:2]
+                color = ['red','green','blue'][axis]
 
-                    vp_x = Xv/Wv
-                    vp_y = Yv/Wv
+                for edge in edges:
 
-                    fig.add_trace(go.Scatter(
-                        x=[mid[0], vp_x],
-                        y=[mid[1], vp_y],
-                        mode='lines',
-                        line=dict(color=color, dash='dot', width=2),
-                        opacity=0.7,
-                        showlegend=False
-                    ))
+                    p1 = coords2d[edge[0]]
+                    p2 = coords2d[edge[1]]
+                    mid = (p1+p2)/2
+
+                    d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
+                    dh = np.append(d3,0)
+
+                    v = P @ dh
+                    Xv,Yv,Wv = v
+
+                    if abs(Wv) > 1e-6:
+
+                        vp_x = Xv/Wv
+                        vp_y = Yv/Wv
+
+                        fig.add_trace(go.Scatter(
+                            x=[mid[0], vp_x],
+                            y=[mid[1], vp_y],
+                            mode='lines',
+                            line=dict(color=color, dash='dot', width=2),
+                            opacity=0.7,
+                            showlegend=False
+                        ))
 
         # horizon/line‑at‑infinity (handles vertical case too)
         if show_inf and 'red' in vp_coords and 'blue' in vp_coords:

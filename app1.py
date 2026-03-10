@@ -236,7 +236,7 @@ def main():
 
         # convergence/vanishing lines (draw from edge midpoints to vp)
         if choice in ["Cube","Pyramid","Plane"]:
-            for edge in obj.edges:
+            for edge in obj.edges[:4]:
                 p1 = coords2d[edge[0]]
                 p2 = coords2d[edge[1]]
                 d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
@@ -246,7 +246,8 @@ def main():
                 if abs(Wv) > 1e-6:
                     vp_x, vp_y = Xv/Wv, Yv/Wv
                     mid = (p1+p2)/2
-                    color = 'red' if abs(d3[0])>0 else 'green' if abs(d3[1])>0 else 'blue'
+                    axis = np.argmax(np.abs(d3))
+                    color = ['red','green','blue'][axis]
                     fig.add_trace(go.Scatter(
                         x=[mid[0], vp_x], y=[mid[1], vp_y],
                         mode='lines',
@@ -313,6 +314,8 @@ def main():
     # fig.update_layout(showlegend=False)
 
     st.plotly_chart(fig, width="stretch")
+    st.write("Vanishing points:")
+    st.write(vx, vy, vz)
 
 if __name__ == "__main__":
     main()

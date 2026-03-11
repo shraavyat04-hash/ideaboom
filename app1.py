@@ -239,7 +239,7 @@ def main():
                     )
 
         # ---- convergence / vanishing lines --------------------------------
-        if choice in ["Cube","Pyramid","Plane","Point Cloud","Sphere"]:
+        if choice in ["Cube","Pyramid","Plane"]:
 
             axis_edges = {0: [], 1: [], 2: []}
 

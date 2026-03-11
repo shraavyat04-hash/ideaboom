@@ -275,6 +275,7 @@ def main():
                         opacity=0.7,
                         showlegend=False
                     ))
+                    
         # horizon/line‑at‑infinity (handles vertical case too)
         if show_inf and 'red' in vp_coords and 'blue' in vp_coords:
             l = np.cross(vp_coords['red'], vp_coords['blue'])

@@ -242,12 +242,6 @@ def main():
         # ---- convergence / vanishing lines --------------------------------
         if choice in ["Cube","Pyramid","Plane"]:
 
-            vp_map = {
-                0: vp_coords['red'],
-                1: vp_coords['green'],
-                2: vp_coords['blue']
-            }
-
             for edge in obj.edges[:6]:
 
                 p1 = coords2d[edge[0]]
@@ -255,16 +249,17 @@ def main():
                 mid = (p1 + p2) / 2
 
                 d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-                axis = np.argmax(np.abs(d3))
+                dh = np.append(d3,0)
 
-                v = vp_map[axis]
-                Xv, Yv, Wv = v
+                v = P @ dh
+                Xv,Yv,Wv = v
 
                 if abs(Wv) > 1e-6:
 
-                    vp_x = Xv / Wv
-                    vp_y = Yv / Wv
+                    vp_x = Xv/Wv
+                    vp_y = Yv/Wv
 
+                    axis = np.argmax(np.abs(d3))
                     color = ['red','green','blue'][axis]
 
                     fig.add_trace(go.Scatter(
@@ -274,7 +269,7 @@ def main():
                         line=dict(color=color, dash='dot', width=2),
                         opacity=0.7,
                         showlegend=False
-                    ))
+                    ))             
                     
         # horizon/line‑at‑infinity (handles vertical case too)
         if show_inf and 'red' in vp_coords and 'blue' in vp_coords:

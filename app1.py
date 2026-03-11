@@ -233,55 +233,48 @@ def main():
                         showlegend=False
                     ))
                     fig.add_annotation(
-                        x=dir2[0]*20, y=dir2[1]*20,
+                        x=center[0] + dir2[0]*20,
+                        y=center[1] + dir2[1]*20,
                         text=f"{color} ∞",
                         showarrow=False, font=dict(color=color)
                     )
 
         # ---- convergence / vanishing lines --------------------------------
-        if choice in ["Cube","Pyramid","Plane","Point Cloud","Sphere"]:
+        if choice in ["Cube","Pyramid","Plane"]:
 
-            axis_edges = {0: [], 1: [], 2: []}
+            vp_map = {
+                0: vp_coords['red'],
+                1: vp_coords['green'],
+                2: vp_coords['blue']
+            }
 
-            # classify edges by dominant axis direction
-            for edge in obj.edges:
+            for edge in obj.edges[:6]:
+
+                p1 = coords2d[edge[0]]
+                p2 = coords2d[edge[1]]
+                mid = (p1 + p2) / 2
+
                 d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-                d3 = d3 / np.linalg.norm(d3)   # normalize direction
                 axis = np.argmax(np.abs(d3))
-                axis_edges[axis].append(edge)
 
-            # draw exactly two rays per direction
-            for axis in range(3):
+                v = vp_map[axis]
+                Xv, Yv, Wv = v
 
-                edges = axis_edges[axis][:2]
-                color = ['red','green','blue'][axis]
+                if abs(Wv) > 1e-6:
 
-                for edge in edges:
+                    vp_x = Xv / Wv
+                    vp_y = Yv / Wv
 
-                    p1 = coords2d[edge[0]]
-                    p2 = coords2d[edge[1]]
-                    mid = (p1+p2)/2
+                    color = ['red','green','blue'][axis]
 
-                    d3 = obj.vertices[edge[1]] - obj.vertices[edge[0]]
-                    dh = np.append(d3,0)
-
-                    v = P @ dh
-                    Xv,Yv,Wv = v
-
-                    if abs(Wv) > 1e-6:
-
-                        vp_x = Xv/Wv
-                        vp_y = Yv/Wv
-
-                        fig.add_trace(go.Scatter(
-                            x=[mid[0], vp_x],
-                            y=[mid[1], vp_y],
-                            mode='lines',
-                            line=dict(color=color, dash='dot', width=2),
-                            opacity=0.7,
-                            showlegend=False
-                        ))
-
+                    fig.add_trace(go.Scatter(
+                        x=[mid[0], vp_x],
+                        y=[mid[1], vp_y],
+                        mode='lines',
+                        line=dict(color=color, dash='dot', width=2),
+                        opacity=0.7,
+                        showlegend=False
+                    ))
         # horizon/line‑at‑infinity (handles vertical case too)
         if show_inf and 'red' in vp_coords and 'blue' in vp_coords:
             l = np.cross(vp_coords['red'], vp_coords['blue'])

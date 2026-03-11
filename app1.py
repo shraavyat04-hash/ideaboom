@@ -352,7 +352,17 @@ def main():
     # fig.update_layout(showlegend=False)
     fig.update_xaxes(range=[-8,8])
     fig.update_yaxes(range=[-8,8])
-   
+    # ---- auto frame scene ---------------------------------------------
+
+    pts = coords2d
+
+    xmin, xmax = pts[:,0].min(), pts[:,0].max()
+    ymin, ymax = pts[:,1].min(), pts[:,1].max()
+
+    pad = 2
+
+    fig.update_xaxes(range=[xmin-pad, xmax+pad], visible=False)
+    fig.update_yaxes(range=[ymin-pad, ymax+pad], visible=False)
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     st.plotly_chart(fig, width="stretch")
    

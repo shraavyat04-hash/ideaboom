@@ -165,6 +165,7 @@ def main():
 
         persp = st.checkbox("Perspective", value=True)
         show_inf = st.checkbox("Line at ∞", value=False)
+        show_cross = st.checkbox("Show Cross-Ratio", value=False)
 
     # pick object (including the extra sphere modes)
     if choice == "Sphere":
@@ -303,21 +304,32 @@ def main():
                 )
 
     # cross‑ratio demonstration
-    proj_line = project_points(line_points, P, perspective=persp)
-    fig.add_trace(go.Scatter(x=proj_line[:,0], y=proj_line[:,1],
-                             mode="lines", line=dict(color='purple', width=2),
-                             showlegend=False))
-    fig.add_trace(go.Scatter(x=proj_line[:,0], y=proj_line[:,1],
-                             mode="markers+text",
-                             text=['A','B','C','D'],
-                             textposition='top right',
-                             marker=dict(size=8, color='purple'),
-                             showlegend=False))
-    cr3 = cross_ratio(*line_points[:,0])
-    cr2 = cross_ratio(proj_line[0,0], proj_line[1,0],
-                      proj_line[2,0], proj_line[3,0])
-    st.markdown(f"**Cross‑ratio 3‑D**: {cr3:.3f}  **2‑D**: {cr2:.3f}")
+    if show_cross:
 
+        proj_line = project_points(line_points, P, perspective=persp)
+
+        fig.add_trace(go.Scatter(
+            x=proj_line[:,0], y=proj_line[:,1],
+            mode="lines",
+            line=dict(color='purple', width=2),
+            showlegend=False
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=proj_line[:,0], y=proj_line[:,1],
+            mode="markers+text",
+            text=['A','B','C','D'],
+            textposition='top right',
+            marker=dict(size=8, color='purple'),
+            showlegend=False
+        ))
+
+        cr3 = cross_ratio(*line_points[:,0])
+        cr2 = cross_ratio(proj_line[0,0], proj_line[1,0],
+                        proj_line[2,0], proj_line[3,0])
+
+        st.markdown(f"**Cross-ratio 3-D**: {cr3:.3f}  **2-D**: {cr2:.3f}")
+        
     # matrix display
     if persp:
         P_disp = np.round(P,2)

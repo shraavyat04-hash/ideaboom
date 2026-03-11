@@ -103,7 +103,7 @@ def cross_ratio(A, B, C, D):
 # scene objects (copied verbatim from geonew1.py)
 cube_pts = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],
                      [-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]])
-cube_pts[:,2] += 6
+cube_pts[:,2] += 8
 cube_edges = [(0,1),(1,2),(2,3),(3,0),
               (4,5),(5,6),(6,7),(7,4),
               (0,4),(1,5),(2,6),(3,7)]
@@ -223,8 +223,11 @@ def main():
                 n = np.linalg.norm(dir2)
                 if n > 1e-6:
                     dir2 /= n
+                    center = coords2d.mean(axis=0)
+
                     fig.add_trace(go.Scatter(
-                        x=[0, dir2[0]*20], y=[0, dir2[1]*20],
+                        x=[center[0], center[0] + dir2[0]*20],
+                        y=[center[1], center[1] + dir2[1]*20],
                         mode="lines",
                         line=dict(color=color, dash='dash'),
                         showlegend=False
@@ -349,17 +352,7 @@ def main():
     # fig.update_layout(showlegend=False)
     fig.update_xaxes(range=[-8,8])
     fig.update_yaxes(range=[-8,8])
-    # ---- auto frame scene ---------------------------------------------
-
-    pts = coords2d
-
-    xmin, xmax = pts[:,0].min(), pts[:,0].max()
-    ymin, ymax = pts[:,1].min(), pts[:,1].max()
-
-    pad = 2
-
-    fig.update_xaxes(range=[xmin-pad, xmax+pad], visible=False)
-    fig.update_yaxes(range=[ymin-pad, ymax+pad], visible=False)
+   
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     st.plotly_chart(fig, width="stretch")
    
